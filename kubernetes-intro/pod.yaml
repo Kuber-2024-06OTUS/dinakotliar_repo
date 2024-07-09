@@ -1,0 +1,43 @@
+# Написать манифест pod.yaml. Он должен описывать под, который:
+# - Будет создаваться в namespace homework
+# - будет иметь контейнер, поднимающий веб-сервер на 8000 порту и отдающий содержимое папки /homework внутри этого контейнера.
+# - Будет иметь init-контейнер, скачивающий или генерирующий файл index.html и сохраняющий его в директорю /init
+#   Будет иметь общий том (volume) для основного и init-контейнера, монтируемый в директорию /homework первого и /init второго
+# - Будет удалять файл index.html из директории /homework основного контейнера, перед его завершением
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: homework-pod
+  namespace: homework
+spec:
+  containers:
+  - name: web-server
+    image: nginx:latest
+    ports:
+    - containerPort: 8000
+    volumeMounts:
+    - name: shared-data
+      mountPath: /homework
+    lifecycle:
+      preStop:
+        exec:
+          command: ["sh", "-c", "rm /homework/index.html"] # удалять файл index.html из директории /homework основного контейнера, перед его завершением
+  initContainers:
+  - name: init-container
+    image: busybox:1.28
+    volumeMounts:
+    - name: shared-data
+      mountPath: /init
+    command: ['sh', '-c', "date >> /init/index.html"] # записываем текущую дату в файл /init/index.html
+    # command:
+    # - wget
+    # - "-O"
+    # - "/init/index.html"
+    # - http://info.cern.ch
+  volumes:
+  - name: shared-data
+    emptyDir: {}
+
+
+   
