@@ -1,0 +1,66 @@
+# Необходимо создать манифест deployment.yaml. 
+# Он должен описывать deployment, который:
+# - Будет создаваться в namespace homework
+# - Запускает 3 экземпляра пода, полностью аналогичных по спецификации прошлому Д3
+# - В дополнение к этому будет иметь readiness пробу, проверяющую наличие файла /homework/index.html
+# - Будет иметь стратегию обновления RollingUpdate, настроенную так, что в процессе обновления может быть недоступен максимум 1 под
+# - Добавить к манифесту deployment-a спецификацию, обеспечивающую запуск подов деплоймента, только на нодах кластера, имеющих метку homework=true
+
+
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hw-deployment
+  namespace: homework
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: hw
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+  template:
+    metadata:
+      labels:
+        app: hw
+    spec:
+      nodeSelector:
+        homework: "true" 
+      containers:
+      - name: web-server
+        image: nginx:latest
+        ports:
+        - containerPort: 8000
+        volumeMounts:
+        - name: shared-data
+          mountPath: /homework
+        lifecycle:
+          preStop:
+            exec:
+              command: ["sh", "-c", "rm /homework/index.html"] # удалять файл index.html из директории /homework основного контейнера, перед его завершением
+        readinessProbe:
+          exec:
+            command: ["sh", "-c", "cat /homework/index.html"]
+          # initialDelaySeconds: 5
+          # periodSeconds: 5
+      initContainers:
+      - name: init-container
+        image: busybox:1.28
+        volumeMounts:
+        - name: shared-data
+          mountPath: /init
+        command: ['sh', '-c', "date >> /init/index.html"] # записываем текущую дату в файл /init/index.html
+        # command:
+        # - wget
+        # - "-O"
+        # - "/init/index.html"
+        # - http://info.cern.ch
+      volumes:
+      - name: shared-data
+        emptyDir: {}
+
+
+   
