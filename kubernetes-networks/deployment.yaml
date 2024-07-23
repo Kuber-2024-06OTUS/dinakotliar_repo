@@ -1,0 +1,61 @@
+# Необходимо 
+# Изменить readiness-пробу в манифесте deployment.yaml из прошлого ДЗ на httpGet, вызывающую URL /index.html
+
+
+
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hw-deployment
+  namespace: homework
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: hw
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+  template:
+    metadata:
+      labels:
+        app: hw
+    spec:
+      nodeSelector:
+        homework: "true" 
+      containers:
+      - name: web-server
+        image: bakavets/kuber:v1.0
+        ports:
+        - containerPort: 8000
+        volumeMounts:
+        - name: shared-data
+          mountPath: /homework
+        lifecycle:
+          preStop:
+            exec:
+              command: ["sh", "-c", "rm /homework/index.html"] # удалять файл index.html из директории /homework основного контейнера, перед его завершением
+        readinessProbe:
+          httpGet:
+            path: /index.html
+            port: 8000
+          # initialDelaySeconds: 5
+          # periodSeconds: 5
+      initContainers:
+      - name: init-container
+        image: busybox:1.28
+        volumeMounts:
+        - name: shared-data
+          mountPath: /init
+        command: ['sh', '-c', "date >> /init/index.html"] # записываем текущую дату в файл /init/index.html
+        # command:
+        # - wget
+        # - "-O"
+        # - "/init/index.html"
+        # - http://info.cern.ch
+      volumes:
+      - name: shared-data
+        emptyDir: {}
+
