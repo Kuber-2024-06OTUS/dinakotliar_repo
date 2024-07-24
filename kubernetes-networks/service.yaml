@@ -1,0 +1,16 @@
+# Необходимо создать манифест service.yaml, описывающий сервис
+# типа ClusterIP, который будет направлять трафик на поды,
+# управляемые вашим deployment
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: hw-service
+spec:
+  selector:
+    app: hw
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8000
+  type: ClusterIP
