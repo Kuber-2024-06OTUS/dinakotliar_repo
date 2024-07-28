@@ -1,0 +1,26 @@
+# Создать манифест ingress.yaml, в котором будет описан объект  типа ingress, направляющий все http запросы к хосту
+# homework.otus на ранее созданный сервис. В результате запрос http://homework.otus/index.html должен отдавать код html
+# страницы, находящейся в подах
+
+# Содержимое configMap в директории /homework/conf получить, обратившись по url /conf/file
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: hw-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: homework.otus
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: hw-service
+            port:
+              number: 80
+
