@@ -1,0 +1,9 @@
+# Создать манифест storageClass.yaml описывающий объект типа storageClass c provisioner https://k8s.io/minikube-hostpath и reclaimPolicy Retain
+
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: hw-sc
+provisioner: k8s.io/minikube-hostpath
+reclaimPolicy: Retain
+volumeBindingMode: Immediate
