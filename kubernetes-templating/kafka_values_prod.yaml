@@ -1,0 +1,22 @@
+# Установить kafka из bitnami helm-чарта. Релиз должен иметь следующие параметры:
+# - Установлен в namespace prod
+# - Должно быть развернуто 5 брокеров
+# - Должна быть установлена kafka версии 3.5.2
+# - Для клиентских и межброкерных взаимодействий должен использоваться протокол SASL_PLAINTEXT
+
+# Описать сценарий установки в helmfile и приложить получившийся helmfile.yaml (и иные файлы, если они будут)
+
+
+image:
+  tag: 3.5.2
+
+replicaCount: 5
+
+auth:
+  clientProtocol: sasl
+  interBrokerProtocol: sasl
+  sasl:
+    mechanism: plaintext
+
+externalAccess:
+  enabled: false
