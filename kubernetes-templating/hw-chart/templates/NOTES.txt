@@ -1,0 +1,19 @@
+Thank you for installing {{ .Chart.Name }}.
+
+Your release is named {{ .Release.Name }}.
+
+To learn more about the release, try:
+
+  $ helm status {{ .Release.Name }}
+  $ helm get all {{ .Release.Name }}
+
+Application URL:
+{{- range $host := .Values.ingress.hosts }}
+  {{- range .paths }}
+  http://{{ $host.host }}{{ .path }}
+  {{- end }}
+{{- end }}
+
+Get service ip:
+    export SERVICE_IP=$(kubectl get service/{{ .Release.Name }}-service -o jsonpath="{.spec.clusterIP}")
+    echo http://$SERVICE_IP

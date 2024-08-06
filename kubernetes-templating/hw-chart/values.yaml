@@ -1,0 +1,40 @@
+# Основные параметры в манифестах, такие как имена объектов, имена контейнеров, используемые образы, хосты, порты, количество запускаемых реплик
+# должны быть заданы как переменные в шаблонах и конфигурироваться через values.yaml либо через параметры при установке релиза
+# Репозиторий и тег образа не должны быть одним параметром 
+# Пробы должны быть включаемы/ отключаемы через конфиг
+# B notes должно быть описано сообщение после установки релиза, отображающее адрес, по которому можно обратится к сервису 
+# При именовании объектов в шаблонах старайтесь придерживаться best practice из лекции 
+# Добавьте в свой чарт сервис-зависимость из доступных community-чартов. Например mysql или redis.
+
+
+replicaCount: 2
+
+deployment:
+  image:
+    repository: nginx
+    tag: latest
+
+  imageInit:
+    repository: busybox
+    tag: 1.28
+
+  containerPort: 8000
+
+  readinessProbeEnable: false
+
+service:
+  type: ClusterIP
+  port: 80
+
+
+
+ingress:
+  className: "nginx"
+  annotations: 
+    nginx.ingress.kubernetes.io/rewrite-target: /
+  hosts:
+    - host: homework.otus
+      paths:
+        - path: /
+          pathType: Prefix
+
