@@ -1,0 +1,50 @@
+# Создать манифест объекта CustomResourceDefinition co следующими параметрами:
+# - Объект уровня namespace
+# - Api group - otus.homework
+# - Kind — MySQL
+# - Plural name - mysqls
+# - Версия - v1
+# Объект должен иметь следующие обязательные атрибуты и правила их валидации(все поля строковые):
+# - Image - определяет docker-образ для создания
+# - Database - имя базы данных
+# - Password - пароль от БД
+# - Storage_size - размер хранилища под базу
+
+
+# Применить все манифесты и убедиться, что CRD создался, оператор работает и при создании кастомного ресурса типа MySQL создает Deployment с указанным образом mysql, service для него, PV и PVC. При удалении объекта типа MySQL удаляются все созданные для него ресурсы
+
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: mysqls.otus.homework
+spec:
+  group: otus.homework
+  versions:
+    - name: v1
+      served: true
+      storage: true
+      schema:
+        openAPIV3Schema:
+          type: object
+          properties:
+            spec:
+              type: object
+              properties:
+                image:
+                  type: string
+                database:
+                  type: string
+                password:
+                  type: string
+                storage_size:
+                  type: string
+              required:
+                - image
+                - database
+                - password
+                - storage_size
+  scope: Namespaced
+  names:
+    plural: mysqls
+    singular: mysql
+    kind: MySQL

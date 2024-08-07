@@ -1,0 +1,12 @@
+# Создать манифест кастомного объекта kind: MySQL валидный для применения (см. атрибуты CRD созданного ранее)
+
+apiVersion: otus.homework/v1
+kind: MySQL
+metadata:
+  name: hw-mysql
+  namespace: hwmysql
+spec:
+  image: mysql:5.7
+  database: mydatabase
+  password: mypassword
+  storage_size: 1Gi
